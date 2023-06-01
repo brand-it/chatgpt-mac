@@ -1,51 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>ChatGPT</title>
-    <link rel="stylesheet" href="index.css" />
-  </head>
-  <body class="myarrow">
-    <div class="page darwin">
-    <webview id="webview" src="https://chat.openai.com/chat" autosize="on" >
-   </webview>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatGPT</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+  <div id="dragbar"></div>
+  <div id="change-key-binding" class="hidden">
+    <div class="change-key-binding-content">
+      <label for="change-key-binding-input-text">Change Key Binding</label>
+      <input id="change-key-binding-input-text"  class="ml-1" type="text" />
+      <input type="submit" id="change-key-binding-submit" class="ml-1" value="Save">
+    </div>
+
   </div>
-    <script>
-    const webview = document.getElementById('webview');
-    webview.addEventListener('dom-ready', function() {
+  <webview id="webview" src="https://chat.openai.com/chat" autosize="on" preload="" >
+  </webview>
+  </div>
+</body>
 
-      // hide message below text input, sidebar, suggestions on new chat
-      webview.insertCSS(`
-        .text-xs.text-center {
-          opacity: 0;
-          height: 0;
-          margin-bottom: -10px;
-        }
-        
-        .sticky,
-        .pointer-events-auto.flex.border-orange-500,
-        [class*="shared__Capabilities"] {
-          display: none !important;
-        }
-
-        [class*="shared__Wrapper"] {
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          margin-top: 15vh;
-        }
-
-        [class*="shared__Wrapper"] h3 {
-          margin-top: -40px;
-          font-size: 20px;
-        }
-      `)
-
-      const element = webview.executeJavaScript(`
-        document.querySelector("[class*='shared__Wrapper']").innerHTML += "<h3>Start by asking anything.</h3>"
-      `);
-    });
-
-    </script>
-  </body>
 </html>
