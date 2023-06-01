@@ -11,10 +11,11 @@ Download:
 
 No Windows binaries currently offered. Clone the repo, npm install electron-forge and run.
 
-<p align="center">
-  <img src="./images/screenshot.jpeg" width="500">
-</p>
+![Jun-01-2023 10-48-44](https://github.com/brand-it/chatgpt-mac/assets/13140/bddc3377-abdd-4121-9cfa-56943367b2f5)
 
+![Jun-01-2023 10-48-56](https://github.com/brand-it/chatgpt-mac/assets/13140/493bfe38-1ad2-4d28-b45a-004cdf79ddd8)
+
+![Jun-01-2023 16-10-00](https://github.com/brand-it/chatgpt-mac/assets/13140/3d808b45-3cad-49aa-991c-d3f8a6ddedc5)
 ## Credit
 
 All credit and copyrights goes to OpenAI.
