@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-mac",
   "productName": "chatgpt-mac",
-  "version": "0.0.5",
+  "version": "0.1.0-alpha.1",
   "description": "Menubar app for ChatGPT",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "appdmg": "^0.6.6",
     "electron-context-menu": "^3.6.0",
+    "electron-settings": "^4.0.2",
     "menubar": "^9.2.3",
     "nucleus-analytics": "^4.0.3",
     "update-electron-app": "^2.0.1"

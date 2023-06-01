@@ -11,39 +11,132 @@ const {
   Menu,
   globalShortcut,
   shell,
+  ipcMain,
 } = require("electron");
 const contextMenu = require("electron-context-menu");
+const { debug } = require("console");
+const settings = require('electron-settings');
 
 const image = nativeImage.createFromPath(
   path.join(__dirname, `images/newiconTemplate.png`)
 );
 
+//-==============================================-//
+// Config Defaults for the menubar app
+//-==============================================-//
+let globalKeyBinding = "CommandOrControl+Shift+g";
+let menubarOpts = {
+  browserWindow: {
+    icon: image,
+    transparent: path.join(__dirname, `images/iconApp.png`),
+    webPreferences: {
+      webviewTag: true,
+      contextIsolation: false,
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js'),
+    },
+    minWidth: 400,
+    width: 750,
+    height: 600,
+    y: 30,
+  },
+  showOnAllWorkspaces: true,
+  preloadWindow: true,
+  showDockIcon: false,
+  icon: image,
+}
+//-==============================================-//
+// END Config Defaults for the menubar app
+//-==============================================-//
+
+function saveWindowPosition(mb) {
+  const pos = mb.window.getPosition();
+  const size = mb.window.getSize();
+  settings.setSync('windowPosition', { x: pos[0], y: pos[1] });
+  settings.setSync('windowSize', { width: size[0], height: size[1] });
+}
+
+function saveWindowSize(mb) {
+  const size = mb.window.getSize();
+  settings.setSync('windowSize', { width: size[0], height: size[1] });
+}
+
+function restoreWindowPosition() {
+  if (settings.hasSync('windowPosition')) {
+    const pos = settings.getSync('windowPosition');
+    menubarOpts.browserWindow.x = pos.x;
+    menubarOpts.browserWindow.y = pos.y;
+  }
+}
+
+function retrieveKeyBinding() {
+  if (settings.hasSync('keyBinding')) {
+    globalKeyBinding = settings.getSync('keyBinding');
+  }
+}
+
+function restoreWindowSize() {
+  if (settings.hasSync('windowSize')) {
+    const size = settings.getSync('windowSize');
+    menubarOpts.browserWindow.width = size.width;
+    menubarOpts.browserWindow.height = size.height;
+  }
+}
+
+function showWindow(window, mb) {
+  if (window.isVisible()) {
+    mb.hideWindow();
+  } else {
+    mb.showWindow();
+    if (process.platform == "darwin") {
+      mb.app.show();
+    }
+    mb.app.focus();
+  }
+}
+
+function registerGlobalKeyBinding(window, mb) {
+  console.log("registering global key binding " + globalKeyBinding)
+  globalShortcut.register(globalKeyBinding, () => {
+    showWindow(window, mb);
+  });
+}
+
 app.on("ready", () => {
   Nucleus.init("638d9ccf4a5ed2dae43ce122");
 
-  const tray = new Tray(image);
+  menubarOpts.tray = new Tray(image);
+  const tray = menubarOpts.tray;
+  menubarOpts.browserWindow.height = Math.round(
+    require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
+  );
 
-  const mb = menubar({
-    browserWindow: {
-      icon: image,
-      transparent: path.join(__dirname, `images/iconApp.png`),
-      webPreferences: {
-        webviewTag: true,
-        // nativeWindowOpen: true,
-      },
-      width: 450,
-      height: 550,
-    },
-    tray,
-    showOnAllWorkspaces: true,
-    preloadWindow: true,
-    showDockIcon: false,
-    icon: image,
+  retrieveKeyBinding();
+  restoreWindowPosition();
+  restoreWindowSize();
+
+  const mb = menubar(menubarOpts);
+
+  mb.on('after-create-window', () => {
+    mb.window.on('move', () => {
+      saveWindowPosition(mb, settings);
+    });
+    mb.window.on('resize', () => {
+      saveWindowSize(mb, settings);
+    });
+    mb.on('show', restoreWindowPosition);
   });
 
   mb.on("ready", () => {
     const { window } = mb;
+    window.setAlwaysOnTop(true, "floating", 1);
 
+    ipcMain.on('change-key-binding', (event, arg) => {
+      globalKeyBinding = arg;
+      settings.setSync('keyBinding', arg);
+      globalShortcut.unregisterAll();
+      registerGlobalKeyBinding(window, mb);
+    });
 
     if (process.platform !== "darwin") {
       window.setSkipTaskbar(true);
@@ -65,6 +158,29 @@ app.on("ready", () => {
         accelerator: "Command+R",
         click: () => {
           window.reload();
+        },
+      },
+      {
+        type: "separator",
+      },
+      // ability to modify keyboard shortcuts
+      {
+        label: "Change Shortcut",
+        click: () => {
+          // show a hidden html element on the document
+          mb.showWindow();
+          if (process.platform == "darwin") {
+            mb.app.show();
+          }
+          mb.app.focus();
+          window.webContents.executeJavaScript(`
+            var changeKeyBinding = document.getElementById('change-key-binding');
+            var textInput = document.getElementById('change-key-binding-input-text')
+            var submitButton = document.getElementById('change-key-binding-submit')
+            changeKeyBinding.classList.remove('hidden');
+            textInput.focus();
+            textInput.value = "${globalKeyBinding}";
+          `);
         },
       },
       {
@@ -100,20 +216,10 @@ app.on("ready", () => {
         ? mb.tray.popUpContextMenu(Menu.buildFromTemplate(contextMenuTemplate))
         : null;
     });
+
+    registerGlobalKeyBinding(window, mb);
+
     const menu = new Menu();
-
-    globalShortcut.register("CommandOrControl+Shift+g", () => {
-      if (window.isVisible()) {
-        mb.hideWindow();
-      } else {
-        mb.showWindow();
-        if (process.platform == "darwin") {
-          mb.app.show();
-        }
-        mb.app.focus();
-      }
-    });
-
     Menu.setApplicationMenu(menu);
 
     // open devtools
