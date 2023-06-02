@@ -184,16 +184,8 @@ function changeAlwaysOnTop(value) {
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
-// Specify the update feed URL
-autoUpdater.setFeedURL({
-  provider: 'github',
-  owner: 'brand-it',
-  repo: 'chatgpt-mac',
-  private: false,
-});
-
 app.whenReady().then(() => {
-  autoUpdater.checkForUpdatesAndNotify();
+
 
   retrieveKeyBinding();
   restoreWindowPosition();
@@ -285,9 +277,8 @@ app.whenReady().then(() => {
     }
   });
 
-
-
   log.info("Menubar app is ready.");
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
