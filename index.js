@@ -13,6 +13,7 @@ const {
   shell,
   ipcMain,
 } = require("electron");
+const { autoUpdater } = require('electron-updater');
 const contextMenu = require("electron-context-menu");
 const { debug } = require("console");
 const settings = require('electron-settings');
@@ -101,9 +102,22 @@ function registerGlobalKeyBinding(window, mb) {
     showWindow(window, mb);
   });
 }
+// Enable logging for update events (optional)
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
+
+// Specify the update feed URL
+autoUpdater.setFeedURL({
+  provider: 'github',
+  owner: 'brand-it',
+  repo: 'chatgpt-mac',
+  private: false,
+});
+
 
 app.on("ready", () => {
   Nucleus.init("638d9ccf4a5ed2dae43ce122");
+  autoUpdater.checkForUpdatesAndNotify();
 
   menubarOpts.tray = new Tray(image);
   const tray = menubarOpts.tray;
@@ -195,13 +209,7 @@ app.on("ready", () => {
       {
         label: "View on GitHub",
         click: () => {
-          shell.openExternal("https://github.com/vincelwt/chatgpt-mac");
-        },
-      },
-      {
-        label: "Author on Twitter",
-        click: () => {
-          shell.openExternal("https://twitter.com/vincelwt");
+          shell.openExternal("https://github.com/brand-it/chatgpt-mac");
         },
       },
     ];
