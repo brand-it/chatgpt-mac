@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-mac",
   "productName": "chatgpt-mac",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Menubar app for ChatGPT",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vincelwt/chatgpt-mac"
+    "url": "https://github.com/brand-it/chatgpt-mac"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",
