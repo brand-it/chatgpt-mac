@@ -12,7 +12,7 @@ Download:
 No Windows binaries currently offered. Clone the repo, npm install electron-forge and run.
 
 ![open-links-in-default-browser](https://github.com/brand-it/chatgpt-mac/assets/13140/da43d3b0-a649-40b5-9e36-7b56a62a2242)
-![Jun-02-2023 16-22-20](https://github.com/brand-it/chatgpt-mac/assets/13140/33677af2-20a2-4f92-abc7-6cf6b9170dfd
+![Jun-02-2023 16-22-20](https://github.com/brand-it/chatgpt-mac/assets/13140/33677af2-20a2-4f92-abc7-6cf6b9170dfd)
 ![loading-screen](https://github.com/brand-it/chatgpt-mac/assets/13140/6e1854cb-055b-4d9d-b16f-52c425e21aae)
 ![resizable](https://github.com/brand-it/chatgpt-mac/assets/13140/beb06428-8176-408c-9667-3ed40b1503e9)
 ![presisted placement](https://github.com/brand-it/chatgpt-mac/assets/13140/1ab6f9d1-403c-4e96-b287-5f46ff9155ab)
