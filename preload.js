@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaultKeyBinding = 'CommandOrControl+Shift+g';
   let keyString = '';
 
+ 
+
   textInput.addEventListener('focus', () => {
     textInput.value = '';
     keyString = '';

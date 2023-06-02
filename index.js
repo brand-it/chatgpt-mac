@@ -26,6 +26,7 @@ let globalKeyBinding = "CommandOrControl+Shift+g";
 let menuBarOpts = {
   browserWindow: {
     alwaysOnTop: true,
+    frame: false,
     height: 600,
     icon: image,
     icon: path.join(__dirname, `images/iconApp.png`),
@@ -34,7 +35,6 @@ let menuBarOpts = {
     resizable: true,
     show: false,
     transparent: true,
-    frame: false,
     width: 750,
     y: 30,
     webPreferences: {
@@ -181,7 +181,6 @@ function changeAlwaysOnTop(value) {
   mainWindow.setAlwaysOnTop(value);
 }
 
-
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
@@ -208,6 +207,16 @@ app.whenReady().then(() => {
   );
 
   Menu.setApplicationMenu(menuBar);
+  mainWindow.setVisibleOnAllWorkspaces(true);
+
+  mainWindow.webContents.on('did-attach-webview', (event, webContents) => {
+    webContents.setWindowOpenHandler(({ url }) => {
+      log.debug(`opening ${url}`)
+      shell.openExternal(url)
+      mainWindow.hide();
+      return { action: 'deny' }
+    })
+  })
 
   mainWindow.on('move', () => {
     saveWindowPosition(mainWindow);
@@ -255,11 +264,6 @@ app.whenReady().then(() => {
 
   app.on("web-contents-created", (e, contents) => {
     if (contents.getType() == "webview") {
-      // open link with external browser in webview
-      contents.on("new-window", (e, url) => {
-        e.preventDefault();
-        shell.openExternal(url);
-      });
       // set context menu in webview
       contextMenu({
         window: contents,
