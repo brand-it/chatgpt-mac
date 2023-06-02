@@ -1,6 +1,7 @@
 body {
   padding: 0;
   margin: 0;
+  font-family: Söhne,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Apple Color Emoji;
 }
 
 :root {
@@ -21,38 +22,55 @@ body {
 
 #webview {
   width: 100%;
-  height: calc(100vh - 12px);
+  margin-top: 20px;
+  height: calc(100vh - 25px);
   display: inline-flex !important;
 }
 
 #dragbar {
   -webkit-app-region: drag;
-  height: 20px;
-  width: 100%;
   background: rgba(46, 47, 57, 1.0);
+  height: 20px;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+}
+.hidden {
+  display: none;
 }
 
-#change-key-binding {
+#change-settings.hidden {
+  display: none;
+}
+
+#change-settings {
+  align-items: center;
   animation: fadein 0.5s;
+  backdrop-filter: blur(10px);
   background: rgba(46, 47, 57, 0.75);
   color: white;
   cursor: pointer;
-  height: 100%;
-  margin: auto;
-  position: absolute;
-  width: 100%;
-  backdrop-filter: blur(10px);
-}
-
-#change-key-binding .change-key-binding-content {
-  align-items: center;
   display: flex;
-  height: 100%;
+  height: 100vh; /* This makes the container take up the full height of the viewport */
   justify-content: center;
+  margin: auto;
+  width: 100%;
+  position: absolute;
 }
 
-.hidden {
-  display: none;
+.change-settings-content .form-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* This spaces out the children equally across the row */
+  margin-bottom: 1em; /* This adds a bit of space below each row */
+}
+
+
+
+.h-100 {
+  height: 100%;
 }
 
 .mr-1 {
@@ -68,6 +86,22 @@ body {
 
 .ml-2 {
   margin-left: 2rem;
+}
+
+.bg-gray {
+  background-color: rgba(46, 47, 57, 1.0);
+}
+
+.bg-light-gray {
+  background-color: rgb(104, 105, 126);
+}
+
+.color-white {
+  color: white;
+}
+
+.invert {
+  filter: invert(1);
 }
 
 input[type="text"],
@@ -103,4 +137,85 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   background-color: rgb(104, 105, 126);
+}
+
+.center {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.color-cycle {
+  animation: color-cycle-animation 5s infinite;
+}
+
+@keyframes color-cycle-animation {
+  0% {
+    background-color: red;
+  }
+  25% {
+    background-color: blue;
+  }
+  50% {
+    background-color: green;
+  }
+  75% {
+    background-color: yellow;
+  }
+  100% {
+    background-color: red;
+  }
+}
+.loading-text {
+  font-size: 50px;
+  position: absolute;
+  color: rgba(76,	78,	94, 1);
+  margin-bottom: 160px;
+}
+.wave {
+  width: 5px;
+  height: 100px;
+  margin: 10px;
+  animation: wave 1s linear infinite, color-cycle-animation 5s infinite;
+  border-radius: 20px;
+}
+.wave:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave:nth-child(6) {
+  animation-delay: 0.5s;
+}
+.wave:nth-child(7) {
+  animation-delay: 0.6s;
+}
+.wave:nth-child(8) {
+  animation-delay: 0.7s;
+}
+.wave:nth-child(9) {
+  animation-delay: 0.8s;
+}
+.wave:nth-child(10) {
+  animation-delay: 0.9s;
+}
+
+@keyframes wave {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
 }

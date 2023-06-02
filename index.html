@@ -5,20 +5,46 @@
   <meta charset="UTF-8" />
   <title>ChatGPT</title>
   <link rel="stylesheet" href="index.css" />
+  <script src="preload.js"></script>
 </head>
 
-<body>
-  <div id="dragbar"></div>
-  <div id="change-key-binding" class="hidden">
-    <div class="change-key-binding-content">
-      <label for="change-key-binding-input-text">Change Key Binding</label>
-      <input id="change-key-binding-input-text"  class="ml-1" type="text" />
-      <input type="submit" id="change-key-binding-submit" class="ml-1" value="Save">
-    </div>
+<body class="bg-gray">
 
+  <div id="dragbar"></div>
+  <div id="loading" class="center">
+    <div class="loading-text">
+      ChatGPT
+    </div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
   </div>
-  <webview id="webview" src="https://chat.openai.com/chat" autosize="on" preload="" >
-  </webview>
+
+  <div id="change-settings" class="hidden">
+    <div class="change-settings-content">
+      <div class="form-row">
+        <label for="change-always-on-top">Always On Top</label>
+        <input id="change-always-on-top" class="ml-1" type="checkbox" />
+      </div>
+      <div class="form-row">
+        <label for="change-key-binding-input-text">Change Key Binding</label>
+        <input id="change-key-binding-input-text" class="ml-1" type="text" />
+      </div>
+      <div class="form-row">
+        <input type="submit" id="change-settings-submit" class="ml-1" value="Save">
+      </div>
+    </div>
+  </div>
+
+  <webview id="webview" src="https://chat.openai.com/chat" autosize="on" allowpopups></webview>
+
   </div>
 </body>
 
