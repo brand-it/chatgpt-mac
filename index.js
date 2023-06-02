@@ -1,77 +1,140 @@
 require("update-electron-app")();
 
-const { menubar } = require("menubar");
-const Nucleus = require("nucleus-analytics");
-
 const path = require("path");
 const {
   app,
-  nativeImage,
-  Tray,
-  Menu,
+  BrowserWindow,
   globalShortcut,
-  shell,
   ipcMain,
+  Menu,
+  nativeImage,
+  shell,
+  Tray,
 } = require("electron");
 const { autoUpdater } = require('electron-updater');
 const contextMenu = require("electron-context-menu");
-const { debug } = require("console");
+const log = require('electron-log');
 const settings = require('electron-settings');
-
 const image = nativeImage.createFromPath(
   path.join(__dirname, `images/newiconTemplate.png`)
 );
 
 //-==============================================-//
-// Config Defaults for the menubar app
+// Config Defaults for the menuBar app
 //-==============================================-//
 let globalKeyBinding = "CommandOrControl+Shift+g";
-let menubarOpts = {
+let menuBarOpts = {
   browserWindow: {
+    alwaysOnTop: true,
+    height: 600,
     icon: image,
-    transparent: path.join(__dirname, `images/iconApp.png`),
+    icon: path.join(__dirname, `images/iconApp.png`),
+    minWidth: 400,
+    movable: true,
+    resizable: true,
+    show: false,
+    transparent: true,
+    frame: false,
+    width: 750,
+    y: 30,
     webPreferences: {
       webviewTag: true,
       contextIsolation: false,
       nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js'),
     },
-    minWidth: 400,
-    width: 750,
-    height: 600,
-    y: 30,
   },
-  showOnAllWorkspaces: true,
-  preloadWindow: true,
-  showDockIcon: false,
-  icon: image,
 }
 //-==============================================-//
-// END Config Defaults for the menubar app
+// END Config Defaults for the menuBar app
 //-==============================================-//
 
-function saveWindowPosition(mb) {
-  const pos = mb.window.getPosition();
-  const size = mb.window.getSize();
+const contextMenuTemplate = [
+  {
+    label: "Quit",
+    accelerator: "Command+Q",
+    click: () => {
+      app.quit();
+    },
+  },
+  {
+    label: "Reload",
+    accelerator: "Command+R",
+    click: () => {
+      mainWindow.reload();
+    },
+  },
+  // {
+  //   label: "Show Dev Tools",
+  //   accelerator: "Command+R",
+  //   click: () => {
+  //     mainWindow.webContents.openDevTools();
+  //   },
+  // },
+  {
+    type: "separator",
+  },
+  {
+    label: "Change Settings",
+    click: () => {
+      // show a hidden html element on the document
+      mainWindow.show();
+      mainWindow.focus();
+      globalShortcut.unregisterAll();
+      mainWindow.webContents.send('show-settings', {
+        keyBinding: globalKeyBinding,
+        alwaysOnTop: menuBarOpts.browserWindow.alwaysOnTop
+      });
+    },
+  },
+  {
+    label: "Open in browser",
+    click: () => {
+      shell.openExternal("https://chat.openai.com/chat");
+    },
+  },
+  {
+    type: "separator",
+  },
+  {
+    label: "View on GitHub",
+    click: () => {
+      shell.openExternal("https://github.com/brand-it/chatgpt-mac");
+    },
+  },
+];
+const menuBar = Menu.buildFromTemplate(contextMenuTemplate)
+
+
+function saveWindowPosition(window) {
+  const pos = window.getPosition();
+  log.debug(`saving window position ${pos[0]} ${pos[1]}`)
   settings.setSync('windowPosition', { x: pos[0], y: pos[1] });
-  settings.setSync('windowSize', { width: size[0], height: size[1] });
 }
 
-function saveWindowSize(mb) {
-  const size = mb.window.getSize();
+function saveWindowSize(window) {
+  const size = window.getSize();
+  log.debug(`saving window size ${size[0]} ${size[1]}`)
   settings.setSync('windowSize', { width: size[0], height: size[1] });
 }
 
 function restoreWindowPosition() {
   if (settings.hasSync('windowPosition')) {
     const pos = settings.getSync('windowPosition');
-    menubarOpts.browserWindow.x = pos.x;
-    menubarOpts.browserWindow.y = pos.y;
+    log.debug(`restoring window position ${pos.x} ${pos.y}`)
+    menuBarOpts.browserWindow.x = pos.x;
+    menuBarOpts.browserWindow.y = pos.y;
+  }
+}
+
+function restoreAlwaysOnTop() {
+  if (settings.hasSync('alwaysOnTop')) {
+    menuBarOpts.browserWindow.alwaysOnTop = settings.getSync('alwaysOnTop');
+    log.debug(`restoring always on top ${menuBarOpts.browserWindow.alwaysOnTop}`);
   }
 }
 
 function retrieveKeyBinding() {
-  if (settings.hasSync('keyBinding')) {
+  if (settings.hasSync('keyBinding') && settings.getSync('keyBinding') !== "") {
     globalKeyBinding = settings.getSync('keyBinding');
   }
 }
@@ -79,31 +142,47 @@ function retrieveKeyBinding() {
 function restoreWindowSize() {
   if (settings.hasSync('windowSize')) {
     const size = settings.getSync('windowSize');
-    menubarOpts.browserWindow.width = size.width;
-    menubarOpts.browserWindow.height = size.height;
+    log.debug(`restoring window size ${size.width} ${size.height}`)
+    menuBarOpts.browserWindow.width = size.width;
+    menuBarOpts.browserWindow.height = size.height;
   }
 }
 
-function showWindow(window, mb) {
+function toggleWindow(window) {
   if (window.isVisible()) {
-    mb.hideWindow();
+    log.debug("hiding window");
+    window.hide();
   } else {
-    mb.showWindow();
-    if (process.platform == "darwin") {
-      mb.app.show();
-    }
-    mb.app.focus();
+    log.debug("showing window");
+    window.show();
   }
 }
 
-function registerGlobalKeyBinding(window, mb) {
-  console.log("registering global key binding " + globalKeyBinding)
-  globalShortcut.register(globalKeyBinding, () => {
-    showWindow(window, mb);
-  });
+function registerGlobalKeyBinding(window) {
+  log.debug("registering global key binding " + globalKeyBinding)
+  // rescue the global key binding if it's not set
+  try {
+    globalShortcut.register(globalKeyBinding, () => {
+      toggleWindow(window);
+    });
+  } catch (e) {
+    log.error("failed to register global key binding " + globalKeyBinding + " " + e);
+    globalKeyBinding = "CommandOrControl+Shift+g";
+    globalShortcut.register(globalKeyBinding, () => {
+      toggleWindow(window);
+    });
+  }
+
 }
-// Enable logging for update events (optional)
-autoUpdater.logger = require('electron-log');
+
+function changeAlwaysOnTop(value) {
+  log.debug("changing always on top to " + value);
+  menuBarOpts.browserWindow.alwaysOnTop = value;
+  mainWindow.setAlwaysOnTop(value);
+}
+
+
+autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 // Specify the update feed URL
@@ -114,127 +193,65 @@ autoUpdater.setFeedURL({
   private: false,
 });
 
-
-app.on("ready", () => {
-  Nucleus.init("638d9ccf4a5ed2dae43ce122");
+app.whenReady().then(() => {
   autoUpdater.checkForUpdatesAndNotify();
-
-  menubarOpts.tray = new Tray(image);
-  const tray = menubarOpts.tray;
-  menubarOpts.browserWindow.height = Math.round(
-    require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
-  );
 
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
+  restoreAlwaysOnTop();
+  mainWindow = new BrowserWindow(menuBarOpts.browserWindow);
+  mainWindow.loadFile("index.html");
+  const tray = new Tray(image);
+  menuBarOpts.browserWindow.height = Math.round(
+    require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
+  );
 
-  const mb = menubar(menubarOpts);
+  Menu.setApplicationMenu(menuBar);
 
-  mb.on('after-create-window', () => {
-    mb.window.on('move', () => {
-      saveWindowPosition(mb, settings);
-    });
-    mb.window.on('resize', () => {
-      saveWindowSize(mb, settings);
-    });
-    mb.on('show', restoreWindowPosition);
+  mainWindow.on('move', () => {
+    saveWindowPosition(mainWindow);
+    saveWindowSize(mainWindow);
   });
 
-  mb.on("ready", () => {
-    const { window } = mb;
-    window.setAlwaysOnTop(true, "floating", 1);
+  mainWindow.on('resize', () => {
+    saveWindowSize(mainWindow);
+  });
 
-    ipcMain.on('change-key-binding', (event, arg) => {
-      globalKeyBinding = arg;
-      settings.setSync('keyBinding', arg);
-      globalShortcut.unregisterAll();
-      registerGlobalKeyBinding(window, mb);
-    });
+  ipcMain.on('change-key-binding', (event, arg) => {
 
-    if (process.platform !== "darwin") {
-      window.setSkipTaskbar(true);
-    } else {
-      app.dock.hide();
+    settings.setSync('keyBinding', arg);
+    globalKeyBinding = arg;
+    globalShortcut.unregisterAll();
+
+    registerGlobalKeyBinding(mainWindow);
+  });
+  ipcMain.on('change-always-on-top', (event, arg) => {
+    settings.setSync('alwaysOnTop', arg);
+    changeAlwaysOnTop(arg);
+  });
+
+  mainWindow.on("blur", () => {
+    if (!menuBarOpts.browserWindow.alwaysOnTop) {
+      mainWindow.hide();
     }
-
-    const contextMenuTemplate = [
-      // add links to github repo and vince's twitter
-      {
-        label: "Quit",
-        accelerator: "Command+Q",
-        click: () => {
-          app.quit();
-        },
-      },
-      {
-        label: "Reload",
-        accelerator: "Command+R",
-        click: () => {
-          window.reload();
-        },
-      },
-      {
-        type: "separator",
-      },
-      // ability to modify keyboard shortcuts
-      {
-        label: "Change Shortcut",
-        click: () => {
-          // show a hidden html element on the document
-          mb.showWindow();
-          if (process.platform == "darwin") {
-            mb.app.show();
-          }
-          mb.app.focus();
-          window.webContents.executeJavaScript(`
-            var changeKeyBinding = document.getElementById('change-key-binding');
-            var textInput = document.getElementById('change-key-binding-input-text')
-            var submitButton = document.getElementById('change-key-binding-submit')
-            changeKeyBinding.classList.remove('hidden');
-            textInput.focus();
-            textInput.value = "${globalKeyBinding}";
-          `);
-        },
-      },
-      {
-        label: "Open in browser",
-        click: () => {
-          shell.openExternal("https://chat.openai.com/chat");
-        },
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "View on GitHub",
-        click: () => {
-          shell.openExternal("https://github.com/brand-it/chatgpt-mac");
-        },
-      },
-    ];
-
-    tray.on("right-click", () => {
-      mb.tray.popUpContextMenu(Menu.buildFromTemplate(contextMenuTemplate));
-    });
-
-    tray.on("click", (e) => {
-      //check if ctrl or meta key is pressed while clicking
-      e.ctrlKey || e.metaKey
-        ? mb.tray.popUpContextMenu(Menu.buildFromTemplate(contextMenuTemplate))
-        : null;
-    });
-
-    registerGlobalKeyBinding(window, mb);
-
-    const menu = new Menu();
-    Menu.setApplicationMenu(menu);
-
-    // open devtools
-    // window.webContents.openDevTools();
-
-    console.log("Menubar app is ready.");
   });
+
+  if (process.platform !== "darwin") {
+    window.setSkipTaskbar(true);
+  } else {
+    app.dock.hide();
+  }
+
+  tray.on("right-click", () => {
+    tray.popUpContextMenu(menuBar);
+  });
+
+  tray.on("click", (e) => {
+    toggleWindow(mainWindow);
+  });
+
+  registerGlobalKeyBinding(mainWindow);
 
   app.on("web-contents-created", (e, contents) => {
     if (contents.getType() == "webview") {
@@ -248,7 +265,7 @@ app.on("ready", () => {
         window: contents,
       });
 
-      // we can't set the native app menu with "menubar" so need to manually register these events
+      // we can't set the native app menu with "menuBar" so need to manually register these events
       // register cmd+c/cmd+v events
       contents.on("before-input-event", (event, input) => {
         const { control, meta, key } = input;
@@ -264,26 +281,9 @@ app.on("ready", () => {
     }
   });
 
-  if (process.platform == "darwin") {
-    // restore focus to previous app on hiding
-    mb.on("after-hide", () => {
-      mb.app.hide();
-    });
-  }
 
-  // open links in new window
-  // app.on("web-contents-created", (event, contents) => {
-  //   contents.on("will-navigate", (event, navigationUrl) => {
-  //     event.preventDefault();
-  //     shell.openExternal(navigationUrl);
-  //   });
-  // });
 
-  // prevent background flickering
-  app.commandLine.appendSwitch(
-    "disable-backgrounding-occluded-windows",
-    "true"
-  );
+  log.info("Menubar app is ready.");
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

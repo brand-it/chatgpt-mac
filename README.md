@@ -6,8 +6,8 @@ You can use Cmd+Shift+G (Mac) or Ctrl+Shift+G (Win) to quickly open it from anyw
 
 Download:
 
-- [Mac Silicon](https://github.com/brand-it/chatgpt-mac/releases/download/v1.0.0/ChatGPT-1.0.0-arm64.dmg)
-- [Mac Intel](https://github.com/brand-it/chatgpt-mac/releases/download/v1.0.0/ChatGPT-1.0.0-x64.dmg)
+- [Mac Silicon](https://github.com/brand-it/chatgpt-mac/releases/download/v1.1.0/ChatGPT-1.1.0-arm64.dmg)
+- [Mac Intel](https://github.com/brand-it/chatgpt-mac/releases/download/v1.1.0/ChatGPT-1.1.0-x64.dmg)
 
 No Windows binaries currently offered. Clone the repo, npm install electron-forge and run.
 
@@ -16,10 +16,3 @@ No Windows binaries currently offered. Clone the repo, npm install electron-forg
 ![Jun-01-2023 10-48-56](https://github.com/brand-it/chatgpt-mac/assets/13140/493bfe38-1ad2-4d28-b45a-004cdf79ddd8)
 
 ![Jun-01-2023 16-10-00](https://github.com/brand-it/chatgpt-mac/assets/13140/3d808b45-3cad-49aa-991c-d3f8a6ddedc5)
-## Credit
-
-All credit and copyrights goes to OpenAI.
-
-## Author
-
-You can find me on Twitter [@vincelwt](https://twitter.com/vincelwt).
