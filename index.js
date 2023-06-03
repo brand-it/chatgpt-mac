@@ -186,7 +186,6 @@ autoUpdater.logger.transports.file.level = 'info';
 
 app.whenReady().then(() => {
 
-
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
