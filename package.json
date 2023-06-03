@@ -6,10 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
-    "package": "electron-forge package --arch arm64,x64",
-    "make": " electron-forge make --arch arm64,x64",
-    "publish": "electron-forge publish --arch arm64,x64",
-    "lint": "echo \"No linting configured\""
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -p always"
   },
   "keywords": [
     "chatgpt",
@@ -43,6 +41,42 @@
     "@electron-forge/publisher-github": "^6.0.4",
     "dotenv": "^16.0.3",
     "electron": ">=22.0.0",
+    "electron-builder": "^23.6.0",
     "electron-squirrel-startup": "^1.0.0"
+  },
+  "build": {
+    "appId": "com.lareaus.chatgpt-mac",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "images/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "brand-it",
+        "repo": "chatgpt-mac"
+      }
+    ],
+    "files": [
+      "index.js",
+      "index.html",
+      "preload.js",
+      "index.css",
+      "package.json",
+      "node_modules/**/*",
+      "images/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }
