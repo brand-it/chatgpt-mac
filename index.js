@@ -10,6 +10,7 @@ const {
   nativeImage,
   shell,
   Tray,
+  dialog,
 } = require("electron");
 const { autoUpdater } = require('electron-updater');
 const contextMenu = require("electron-context-menu");
@@ -18,6 +19,7 @@ const settings = require('electron-settings');
 const image = nativeImage.createFromPath(
   path.join(__dirname, `images/newiconTemplate.png`)
 );
+const currentVersion = app.getVersion();
 
 //-==============================================-//
 // Config Defaults for the menuBar app
@@ -109,12 +111,11 @@ const contextMenuTemplate = [
   {
     label: "Check for updates",
     click: () => {
-      autoUpdater.checkForUpdatesAndNotify();
+      autoUpdater.checkForUpdates();
     },
   },
 ];
 const menuBar = Menu.buildFromTemplate(contextMenuTemplate)
-
 
 function saveWindowPosition(window) {
   const pos = window.getPosition();
@@ -196,7 +197,7 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 app.whenReady().then(() => {
-  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdates();
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
@@ -231,17 +232,18 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('change-key-binding', (event, arg) => {
-
     settings.setSync('keyBinding', arg);
     globalKeyBinding = arg;
     globalShortcut.unregisterAll();
 
     registerGlobalKeyBinding(mainWindow);
   });
+
   ipcMain.on('change-always-on-top', (event, arg) => {
     settings.setSync('alwaysOnTop', arg);
     changeAlwaysOnTop(arg);
   });
+
 
   mainWindow.on("blur", () => {
     if (!menuBarOpts.browserWindow.alwaysOnTop) {
@@ -291,6 +293,32 @@ app.whenReady().then(() => {
     }
   });
   app.dock.hide(); // hide the dock icon and only show the menubar icon
+  autoUpdater.on('update-available', (info) => {
+    log.info("update available");
+    mainWindow.show();
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Update Available',
+      message: 'A new version of the app is available. Do you want to download it now?',
+      buttons: ['Download', 'No Thanks']
+    }).then((result) => {
+      log.debug("result", result)
+      if (result.response === 0) {
+        // if the OS is mac using a silicon chip then download the arm64 version
+        log.debug("autoUpdater.updateInfo", info);
+        let newestVersion = info.version;
+        let downloadUrl = "";
+        if (process.platform === "darwin" && process.arch === "arm64") {
+          downloadUrl = `https://github.com/brand-it/chatgpt-mac/releases/download/v${newestVersion}/ChatGPT-${newestVersion}-arm64.dmg`
+        } else {
+          downloadUrl = `https://github.com/brand-it/chatgpt-mac/releases/download/v${newestVersion}/ChatGPT-${newestVersion}.dmg`
+        }
+        log.debug("downloadUrl", downloadUrl);
+        shell.openExternal(downloadUrl);
+      }
+    });
+  });
+
   log.info("Menubar app is ready.");
 });
 

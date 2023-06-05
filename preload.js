@@ -1,6 +1,16 @@
-const { ipcRenderer, process } = require('electron');
+const { ipcRenderer, app } = require('electron');
 const log = require('electron-log');
+const fs = require('fs');
+const path = require('path');
+
+
+const packagePath = path.join(__dirname, 'package.json');
+const packageData = fs.readFileSync(packagePath, 'utf8');
+const packageJson = JSON.parse(packageData);
+
+const appVersion = packageJson.version;
 window.api = ipcRenderer;
+
 
 function blank(string) { return string === '' || string === undefined || string === null }
 
@@ -18,12 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const webview = document.getElementById('webview');
   const defaultKeyBinding = 'CommandOrControl+Shift+g';
   const keyBindingClearButton = document.getElementById('key-binding-clear-button');
+  const currentVersion = document.getElementById('current-version');
   let keyString = '';
+  currentVersion.innerHTML = `v${appVersion}`;
 
   textInput.addEventListener('focus', () => {
     textInput.value = '';
     keyString = '';
   });
+
   textInput.addEventListener('blur', () => {
     if (textInput.value === '') {
       textInput.value = defaultKeyBinding;
