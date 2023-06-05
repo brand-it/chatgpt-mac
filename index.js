@@ -10,6 +10,7 @@ const {
   nativeImage,
   shell,
   Tray,
+  dialog,
 } = require("electron");
 const { autoUpdater } = require('electron-updater');
 const contextMenu = require("electron-context-menu");
