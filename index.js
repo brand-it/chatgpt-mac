@@ -251,12 +251,6 @@ app.whenReady().then(() => {
     }
   });
 
-  if (process.platform !== "darwin") {
-    window.setSkipTaskbar(true);
-  } else {
-    app.dock.hide();
-  }
-
   tray.on("right-click", () => {
     tray.popUpContextMenu(menuBar);
   });
@@ -292,7 +286,7 @@ app.whenReady().then(() => {
       });
     }
   });
-  app.dock.hide(); // hide the dock icon and only show the menubar icon
+
   autoUpdater.on('update-available', (info) => {
     log.info("update available");
     mainWindow.show();
@@ -320,6 +314,12 @@ app.whenReady().then(() => {
   });
 
   log.info("Menubar app is ready.");
+});
+
+app.on("ready", () => {
+  log.info("app is ready");
+  app.dock.hide();
+  autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
