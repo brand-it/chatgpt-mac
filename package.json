@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
-    "pack": "electron-builder --dir",
+    "pack": "electron-builder -p never",
     "dist": "electron-builder -p always"
   },
   "keywords": [

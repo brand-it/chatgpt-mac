@@ -192,13 +192,13 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 app.whenReady().then(() => {
-
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
   restoreAlwaysOnTop();
   mainWindow = new BrowserWindow(menuBarOpts.browserWindow);
   mainWindow.loadFile("index.html");
+  app.dock.hide(); // hide the dock icon and only show the menubar icon
   const tray = new Tray(image);
   menuBarOpts.browserWindow.height = Math.round(
     require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
