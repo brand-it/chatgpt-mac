@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-mac",
-  "productName": "chatgpt-mac",
-  "version": "1.6.3",
+  "productName": "ChatGPT",
+  "version": "1.6.4",
   "description": "Menubar app for ChatGPT",
   "main": "index.js",
   "scripts": {
@@ -47,6 +47,7 @@
   "build": {
     "appId": "com.lareaus.chatgpt-mac",
     "compression": "maximum",
+    "productName": "ChatGPT",
     "mac": {
       "category": "public.app-category.utilities",
       "icon": "images/icon.icns",
