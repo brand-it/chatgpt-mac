@@ -10,7 +10,6 @@ const {
   nativeImage,
   shell,
   Tray,
-  dialog,
 } = require("electron");
 const { autoUpdater } = require('electron-updater');
 const contextMenu = require("electron-context-menu");
@@ -110,7 +109,7 @@ const contextMenuTemplate = [
   {
     label: "Check for updates",
     click: () => {
-      autoUpdater.checkForUpdates();
+      autoUpdater.checkForUpdatesAndNotify();
     },
   },
 ];
@@ -197,6 +196,7 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 app.whenReady().then(() => {
+  autoUpdater.checkForUpdatesAndNotify();
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
@@ -292,7 +292,7 @@ app.whenReady().then(() => {
   });
 
   log.info("Menubar app is ready.");
-  autoUpdater.checkForUpdates();
+
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -302,23 +302,4 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
-});
-
-
-autoUpdater.on('update-available', () => {
-  log.info("update available");
-  autoUpdater.downloadUpdate();
-});
-
-autoUpdater.on('update-downloaded', () => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Available',
-    message: 'A new version of the app is available. Do you want to update now?',
-    buttons: ['Update', 'Cancel']
-  }).then((result) => {
-    if (result.response === 0) {
-      autoUpdater.quitAndInstall();
-    }
-  });
 });
