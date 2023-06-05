@@ -6,8 +6,8 @@ You can use Cmd+Shift+G (Mac) or Ctrl+Shift+G (Win) to quickly open it from anyw
 
 Download:
 
-- [Mac Silicon](https://github.com/brand-it/chatgpt-mac/releases/download/v1.6.0/chatgpt-mac-1.6.0-arm64.dmg)
-- [Mac](https://github.com/brand-it/chatgpt-mac/releases/download/v1.6.0/chatgpt-mac-1.6.0.dmg)
+- [Mac Silicon](https://github.com/brand-it/chatgpt-mac/releases/download/v1.6.3/chatgpt-mac-1.6.3-arm64.dmg)
+- [Mac](https://github.com/brand-it/chatgpt-mac/releases/download/v1.6.3/chatgpt-mac-1.6.3.dmg)
 
 No Windows binaries currently offered. Clone the repo, npm install electron-forge and run.
 
