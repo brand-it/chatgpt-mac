@@ -1,0 +1,21 @@
+# /bin/bash
+
+# This script is used to set up a development environment and should be run
+# after cloning the repository.
+
+# Exit if any subcommand fails.
+
+set -e
+
+echo "Setting up development environment..."
+
+asdf install
+
+echo "running npm install"
+npm install
+
+echo "setup complete 🎉"
+
+echo "To start the app run: npm start"
+echo "To package the app run: npm run pack"
+echo "To package the app run: npm run dist"

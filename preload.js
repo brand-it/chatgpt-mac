@@ -2,6 +2,12 @@ const { ipcRenderer, process } = require('electron');
 const log = require('electron-log');
 window.api = ipcRenderer;
 
+function blank(string) { return string === '' || string === undefined || string === null }
+
+function hasKeyBinding(keyString, key) {
+  blank(keyString) && (keyString.includes(`+${key}`) || keyString.startsWith(key))
+}
+
 // wait for the DOM to load
 document.addEventListener('DOMContentLoaded', () => {
   const alwaysOnTop = document.getElementById('change-always-on-top');
@@ -11,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const textInput = document.getElementById('change-key-binding-input-text')
   const webview = document.getElementById('webview');
   const defaultKeyBinding = 'CommandOrControl+Shift+g';
+  const keyBindingClearButton = document.getElementById('key-binding-clear-button');
   let keyString = '';
 
   textInput.addEventListener('focus', () => {
@@ -26,14 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
   textInput.addEventListener('keydown', (event) => {
     // prevent default behavior
     event.preventDefault();
-    // don't add the same key twice
-    if (keyString.indexOf(event.key) === -1) {
-      if (keyString !== '') {
-        keyString += '+';
-      }
+    // don't add the same key twice by looking for +key or starts with key
+    if (!hasKeyBinding(keyString, event.key)) {
+      if (!blank(keyString)) { keyString += '+'; }
       keyString += event.key;
     }
+    log.debug('keyString', keyString)
     textInput.value = keyString;
+  });
+
+  keyBindingClearButton.addEventListener('click', () => {
+    textInput.value = defaultKeyBinding;
+    keyString = '';
   });
 
   submitButton.addEventListener('click', () => {

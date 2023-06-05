@@ -28,26 +28,39 @@
   </div>
 
   <div id="change-settings" class="hidden">
-
-    <div class="change-settings-content">
-      <div class="form-row"><div>V1.3.0</div></div>
-      <div class="form-row">
-        <label for="change-always-on-top">Always On Top</label>
-        <input id="change-always-on-top" class="ml-1" type="checkbox" />
+    <div class="content">
+      <div class="row mt-1">
+        <div class="col-2">
+          <label for="change-always-on-top">Always On Top</label>
+        </div>
+        <div class="col-10">
+          <input id="change-always-on-top" type="checkbox" />
+        </div>
       </div>
-      <div class="form-row">
-        <label for="change-key-binding-input-text">Change Key Binding</label>
-        <input id="change-key-binding-input-text" class="ml-1" type="text" />
+      <div class="row mt-1">
+        <div class="col-2">
+          <label for="change-key-binding-input-text">Change Key Binding</label>
+        </div>
+        <div class="col-9 mr-1">
+          <input id="change-key-binding-input-text" type="text" />
+        </div>
+        <div class="col-1">
+          <input type="submit" id="key-binding-clear-button" value="Reset">
+        </div>
       </div>
-      <div class="form-row">
-        <input type="submit" id="change-settings-submit" class="ml-1" value="Save">
+      <div class="row mt-1">
+        <div class="col">
+          <input type="submit" id="change-settings-submit" value="Save">
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-2 text-muted">V1.4.0</div>
+        <div class="col-10"></div>
       </div>
     </div>
   </div>
 
   <webview id="webview" src="https://chat.openai.com/chat" autosize="on" allowpopups></webview>
-
-  </div>
 </body>
 
 </html>
