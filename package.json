@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-mac",
   "productName": "chatgpt-mac",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Menubar app for ChatGPT",
   "main": "index.js",
   "scripts": {

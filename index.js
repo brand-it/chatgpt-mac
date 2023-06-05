@@ -302,3 +302,22 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+
+
+autoUpdater.on('update-available', () => {
+  log.info("update available");
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on('update-downloaded', () => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Available',
+    message: 'A new version of the app is available. Do you want to update now?',
+    buttons: ['Update', 'Cancel']
+  }).then((result) => {
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
