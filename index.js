@@ -110,7 +110,7 @@ const contextMenuTemplate = [
   {
     label: "Check for updates",
     click: () => {
-      autoUpdater.checkForUpdatesAndNotify();
+      autoUpdater.checkForUpdates();
     },
   },
 ];
@@ -292,7 +292,7 @@ app.whenReady().then(() => {
   });
 
   log.info("Menubar app is ready.");
-  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
