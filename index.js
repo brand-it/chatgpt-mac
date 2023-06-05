@@ -106,8 +106,12 @@ const contextMenuTemplate = [
       shell.openExternal("https://github.com/brand-it/chatgpt-mac");
     },
   },
-
-
+  {
+    label: "Check for updates",
+    click: () => {
+      autoUpdater.checkForUpdatesAndNotify();
+    },
+  },
 ];
 const menuBar = Menu.buildFromTemplate(contextMenuTemplate)
 
