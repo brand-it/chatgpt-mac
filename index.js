@@ -34,6 +34,7 @@ let menuBarOpts = {
     movable: true,
     resizable: true,
     show: false,
+    skipTaskbar: true,
     transparent: true,
     width: 750,
     y: 30,
@@ -63,16 +64,20 @@ const contextMenuTemplate = [
       mainWindow.reload();
     },
   },
-  // {
-  //   label: "Show Dev Tools",
-  //   accelerator: "Command+R",
-  //   click: () => {
-  //     mainWindow.webContents.openDevTools();
-  //   },
-  // },
   {
     type: "separator",
   },
+  ...(process.env.NODE_ENV === "development"
+    ? [
+        {
+          label: "Show Dev Tools",
+          accelerator: "Command+D",
+          click: () => {
+            mainWindow.webContents.openDevTools();
+          },
+        },
+      ]
+    : []),
   {
     label: "Change Settings",
     click: () => {
@@ -101,6 +106,8 @@ const contextMenuTemplate = [
       shell.openExternal("https://github.com/brand-it/chatgpt-mac");
     },
   },
+
+
 ];
 const menuBar = Menu.buildFromTemplate(contextMenuTemplate)
 
@@ -185,13 +192,13 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
 app.whenReady().then(() => {
-
   retrieveKeyBinding();
   restoreWindowPosition();
   restoreWindowSize();
   restoreAlwaysOnTop();
   mainWindow = new BrowserWindow(menuBarOpts.browserWindow);
   mainWindow.loadFile("index.html");
+  app.dock.hide(); // hide the dock icon and only show the menubar icon
   const tray = new Tray(image);
   menuBarOpts.browserWindow.height = Math.round(
     require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
@@ -271,7 +278,10 @@ app.whenReady().then(() => {
         if (key === "z") contents.undo();
         if (key === "y") contents.redo();
         if (key === "q") app.quit();
-        if (key === "r") contents.reload();
+        if (key === "r") {
+          registerGlobalKeyBinding(mainWindow);
+          contents.reload();
+        }
       });
     }
   });
