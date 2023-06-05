@@ -203,8 +203,8 @@ app.whenReady().then(() => {
   restoreAlwaysOnTop();
   mainWindow = new BrowserWindow(menuBarOpts.browserWindow);
   mainWindow.loadFile("index.html");
-  app.dock.hide(); // hide the dock icon and only show the menubar icon
   const tray = new Tray(image);
+
   menuBarOpts.browserWindow.height = Math.round(
     require("electron").screen.getPrimaryDisplay().workAreaSize.height / 2
   );
@@ -290,9 +290,8 @@ app.whenReady().then(() => {
       });
     }
   });
-
+  app.dock.hide(); // hide the dock icon and only show the menubar icon
   log.info("Menubar app is ready.");
-
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
